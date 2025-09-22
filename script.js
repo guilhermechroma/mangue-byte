@@ -21,7 +21,7 @@ class Boundary {
     }
 
     draw() {
-        c.fillStyle = "rgba(255, 0, 0, 0.5)";
+        c.fillStyle = "rgba(255, 0, 0, 0.0)";
         c.fillRect(this.position.x, this.position.y, this.width, this.height);
     }
 }
@@ -197,8 +197,15 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
     );
 }
 
+let gameOver = false;
+
 // DESENHO E MOVIMENTAÇÃO DOS ELEMENTOS NA TELA
 function animate() {
+    // Se o jogo acabou, para a animação
+    if (gameOver) {
+        return;
+    }
+
     window.requestAnimationFrame(animate);
     background.draw();
     boundaries.forEach((boundary) => {
@@ -219,6 +226,7 @@ function animate() {
         // Lógica de colisão entre o player e o carro
         if (rectangularCollision({ rectangle1: player, rectangle2: car })) {
             alert("Colisão! Fim de jogo.");
+            gameOver = true;
         }
     });
     player.draw();
