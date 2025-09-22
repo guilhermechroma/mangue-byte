@@ -18,8 +18,8 @@ Um jogo arcade estilo Frogger, com ambientação no Centro de Recife, onde você
 
 ## TO-DO (Para fazer)
 
+- ~~Adicionar obstáculos (carros, motos, pedestres..)~~
 - Corrigir certos problemas de colisão com o cenário (temporário) atual
-- Adicionar obstáculos (carros, motos, pedestres..)
 - Adicionar condição de derrota, caso colida com um obstáculo
 - Adicionar condição de vitória, ao chegar no final da fase
 - Adicionar interface que mostra o quão perto está do final da fase

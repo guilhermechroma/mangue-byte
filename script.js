@@ -21,7 +21,7 @@ class Boundary {
     }
 
     draw() {
-        c.fillStyle = "rgba(255, 0, 0, 0.0)";
+        c.fillStyle = "rgba(255, 0, 0, 0.5)";
         c.fillRect(this.position.x, this.position.y, this.width, this.height);
     }
 }
@@ -56,9 +56,22 @@ backgroundImage.src = "./assets/imgs/map.png";
 const playerImage = new Image();
 playerImage.src = "./assets/imgs/playerDown.png";
 
+//IMAGEM DOS CARROS
+const car1Image = new Image();
+car1Image.src = "./assets/imgs/car1.png";
+
+const car1ReverseImage = new Image();
+car1ReverseImage.src = "./assets/imgs/car1-reverse.png";
+
+const car2Image = new Image();
+car2Image.src = "./assets/imgs/car2.png";
+
+const car2ReverseImage = new Image();
+car2ReverseImage.src = "./assets/imgs/car2-reverse.png";
+
 // CLASSE PARA OS SPRITES DO JOGO
 class Sprite {
-    constructor({ position, velocity, image, frames = { max: 1 } }) {
+    constructor({ position, image, frames = { max: 1 }, collisionBox }) {
         this.position = position;
         this.image = image;
         this.frames = frames;
@@ -67,6 +80,7 @@ class Sprite {
             this.width = this.image.width / this.frames.max;
             this.height = this.image.height;
         };
+        this.collisionBox = collisionBox;
     }
 
     draw() {
@@ -96,7 +110,7 @@ const background = new Sprite({
 // PROPRIEDADES DO PLAYER
 const player = new Sprite({
     position: {
-        x: canvas.width / 2.05,
+        x: canvas.width / 2.1,
         y: 488,
     },
     image: playerImage,
@@ -104,6 +118,34 @@ const player = new Sprite({
         max: 4,
     },
 });
+
+// PROPRIEDADES DO CARRO (QUE ESTENDE DE SPRITE)
+class Car extends Sprite {
+    constructor({ position, image, velocity }) {
+        super({ position, image });
+        this.velocity = velocity;
+    }
+
+    // Método para atualizar a posição do carro a cada frame
+    update() {
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+    }
+}
+
+// CARROS DO JOGO
+const cars = [
+    new Car({
+        position: { x: -100, y: 300 }, // Fora da tela, na faixa de cima
+        image: car1ReverseImage,
+        velocity: { x: 3, y: 0 }, // Movimento para a direita
+    }),
+    new Car({
+        position: { x: 800, y: 400 }, // Fora da tela, na faixa de baixo
+        image: car2Image,
+        velocity: { x: -2, y: 0 }, // Movimento para a esquerda
+    }),
+];
 
 // TECLAS DO JOGO INICIALIZADAS COMO NÃO PRESSIONADAS
 const keys = {
@@ -122,14 +164,36 @@ const keys = {
 };
 
 // ELEMENTOS QUE PODEM SE MOVER PARA CIMA E PARA BAIXO
-const movables = [background, ...boundaries];
+const movables = [background, ...boundaries, ...cars];
 
 function rectangularCollision({ rectangle1, rectangle2 }) {
+    // Usar as dimensões da caixa de colisão, se existirem
+    const rect1Width = rectangle1.collisionBox
+        ? rectangle1.collisionBox.width
+        : rectangle1.width;
+    const rect1Height = rectangle1.collisionBox
+        ? rectangle1.collisionBox.height
+        : rectangle1.height;
+    const rect2Width = rectangle2.collisionBox
+        ? rectangle2.collisionBox.width
+        : rectangle2.width;
+    const rect2Height = rectangle2.collisionBox
+        ? rectangle2.collisionBox.height
+        : rectangle2.height;
+
+    // Ajustar as posições para centralizar a colisão
+    const rect1X = rectangle1.position.x + (rectangle1.width - rect1Width) / 2;
+    const rect1Y =
+        rectangle1.position.y + (rectangle1.height - rect1Height) / 2;
+    const rect2X = rectangle2.position.x + (rectangle2.width - rect2Width) / 2;
+    const rect2Y =
+        rectangle2.position.y + (rectangle2.height - rect2Height) / 2;
+
     return (
-        rectangle1.position.x + rectangle1.width >= rectangle2.position.x &&
-        rectangle1.position.x <= rectangle2.position.x + rectangle2.width &&
-        rectangle1.position.y + rectangle1.width >= rectangle2.position.y &&
-        rectangle1.position.y <= rectangle2.position.y + rectangle2.width
+        rect1X + rect1Width >= rect2X &&
+        rect1X <= rect2X + rect2Width &&
+        rect1Y + rect1Height >= rect2Y &&
+        rect1Y <= rect2Y + rect2Height
     );
 }
 
@@ -139,6 +203,23 @@ function animate() {
     background.draw();
     boundaries.forEach((boundary) => {
         boundary.draw();
+    });
+    // Loop para atualizar e desenhar os carros
+    cars.forEach((car) => {
+        car.update(); // Atualiza a posição
+        car.draw(); // Desenha o carro
+
+        // Reinicia o carro se ele sair da tela
+        if (car.velocity.x > 0 && car.position.x > canvas.width + 100) {
+            car.position.x = -100;
+        } else if (car.velocity.x < 0 && car.position.x < -100) {
+            car.position.x = canvas.width + 100;
+        }
+
+        // Lógica de colisão entre o player e o carro
+        if (rectangularCollision({ rectangle1: player, rectangle2: car })) {
+            alert("Colisão! Fim de jogo.");
+        }
     });
     player.draw();
 
@@ -185,7 +266,7 @@ function animate() {
                         ...boundary,
                         position: {
                             x: boundary.position.x,
-                            y: boundary.position.y - 23,
+                            y: boundary.position.y - 2.5,
                         },
                     },
                 })
@@ -212,7 +293,7 @@ function animate() {
                     rectangle2: {
                         ...boundary,
                         position: {
-                            x: boundary.position.x + 3.14,
+                            x: boundary.position.x + 2.5,
                             y: boundary.position.y,
                         },
                     },
@@ -238,7 +319,7 @@ function animate() {
                     rectangle2: {
                         ...boundary,
                         position: {
-                            x: boundary.position.x - 3.14,
+                            x: boundary.position.x - 2.5,
                             y: boundary.position.y,
                         },
                     },
