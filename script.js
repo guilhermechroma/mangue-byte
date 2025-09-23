@@ -71,10 +71,20 @@ car2ReverseImage.src = "./assets/imgs/car2-reverse.png";
 
 // CLASSE PARA OS SPRITES DO JOGO
 class Sprite {
-    constructor({ position, image, frames = { max: 1 }, collisionBox }) {
+    constructor({
+        position,
+        image,
+        frames = { max: 1 },
+        collisionBox,
+        width,
+        height,
+    }) {
         this.position = position;
         this.image = image;
         this.frames = frames;
+        this.width = width;
+        this.height = height;
+
         // ESPERA A IMAGEM CARREGAR PARA RETORNAR SEU TAMANHO PELA QNTD DE FRAMES
         this.image.onload = () => {
             this.width = this.image.width / this.frames.max;
@@ -121,8 +131,8 @@ const player = new Sprite({
 
 // PROPRIEDADES DO CARRO (QUE ESTENDE DE SPRITE)
 class Car extends Sprite {
-    constructor({ position, image, velocity }) {
-        super({ position, image });
+    constructor({ position, image, velocity, collisionBox, width, height }) {
+        super({ position, image, collisionBox, width, height });
         this.velocity = velocity;
     }
 
@@ -136,34 +146,52 @@ class Car extends Sprite {
 // CARROS DO JOGO
 const cars = [
     new Car({
-        position: { x: 200, y: 300 },
+        position: { x: 200, y: 300 }, // y 300 = fileira de cima
         image: car1ReverseImage,
         velocity: { x: 3, y: 0 }, // Movimento para a direita (positivo)
-    }),
-    new Car({
-        position: { x: 600, y: 400 },
-        image: car2Image,
-        velocity: { x: -2, y: 0 }, // Movimento para a esquerda (negativo)
-    }),
-    new Car({
-        position: { x: -200, y: 300 },
-        image: car2ReverseImage,
-        velocity: { x: 3, y: 0 },
-    }),
-    new Car({
-        position: { x: 300, y: 400 },
-        image: car1Image,
-        velocity: { x: -2, y: 0 },
-    }),
-    new Car({
-        position: { x: 1000, y: 400 },
-        image: car1Image,
-        velocity: { x: -2, y: 0 },
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
     }),
     new Car({
         position: { x: 600, y: 300 },
         image: car2ReverseImage,
         velocity: { x: 3, y: 0 },
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Car({
+        position: { x: -200, y: 300 },
+        image: car2ReverseImage,
+        velocity: { x: 3, y: 0 },
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Car({
+        position: { x: 600, y: 400 }, // y 400 = fileira de baixo
+        image: car2Image,
+        velocity: { x: -2, y: 0 }, // Movimento para a esquerda (negativo)
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Car({
+        position: { x: 1000, y: 400 },
+        image: car1Image,
+        velocity: { x: -2, y: 0 },
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Car({
+        position: { x: 300, y: 400 },
+        image: car1Image,
+        velocity: { x: -2, y: 0 },
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
     }),
 ];
 
