@@ -111,7 +111,7 @@ const background = new Sprite({
 const player = new Sprite({
     position: {
         x: canvas.width / 2.1,
-        y: 488,
+        y: 485,
     },
     image: playerImage,
     frames: {
@@ -136,14 +136,34 @@ class Car extends Sprite {
 // CARROS DO JOGO
 const cars = [
     new Car({
-        position: { x: -100, y: 300 }, // Fora da tela, na faixa de cima
+        position: { x: 200, y: 300 },
         image: car1ReverseImage,
-        velocity: { x: 3, y: 0 }, // Movimento para a direita
+        velocity: { x: 3, y: 0 }, // Movimento para a direita (positivo)
     }),
     new Car({
-        position: { x: 800, y: 400 }, // Fora da tela, na faixa de baixo
+        position: { x: 600, y: 400 },
         image: car2Image,
-        velocity: { x: -2, y: 0 }, // Movimento para a esquerda
+        velocity: { x: -2, y: 0 }, // Movimento para a esquerda (negativo)
+    }),
+    new Car({
+        position: { x: -200, y: 300 },
+        image: car2ReverseImage,
+        velocity: { x: 3, y: 0 },
+    }),
+    new Car({
+        position: { x: 300, y: 400 },
+        image: car1Image,
+        velocity: { x: -2, y: 0 },
+    }),
+    new Car({
+        position: { x: 1000, y: 400 },
+        image: car1Image,
+        velocity: { x: -2, y: 0 },
+    }),
+    new Car({
+        position: { x: 600, y: 300 },
+        image: car2ReverseImage,
+        velocity: { x: 3, y: 0 },
     }),
 ];
 
@@ -225,7 +245,7 @@ function animate() {
 
         // Lógica de colisão entre o player e o carro
         if (rectangularCollision({ rectangle1: player, rectangle2: car })) {
-            alert("Colisão! Fim de jogo.");
+            alert("Você foi atropelado! Fim de jogo.");
             gameOver = true;
         }
     });
