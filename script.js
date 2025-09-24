@@ -10,22 +10,6 @@ for (let i = 0; i < collisions.length; i += 15) {
     collisionsMap.push(collisions.slice(i, 15 + i));
 }
 
-// CLASSE DAS PROPRIEDADES DOS LIMITES/BOUNDARIES/CAIXAS DE COLISÃO
-class Boundary {
-    static width = 64;
-    static height = 64;
-    constructor({ position }) {
-        this.position = position;
-        this.width = 64;
-        this.height = 64;
-    }
-
-    draw() {
-        c.fillStyle = "rgba(255, 0, 0, 0.0)";
-        c.fillRect(this.position.x, this.position.y, this.width, this.height);
-    }
-}
-
 const boundaries = [];
 const offset = {
     x: 0,
@@ -69,44 +53,8 @@ car2Image.src = "./assets/imgs/car2.png";
 const car2ReverseImage = new Image();
 car2ReverseImage.src = "./assets/imgs/car2-reverse.png";
 
-// CLASSE PARA OS SPRITES DO JOGO
-class Sprite {
-    constructor({
-        position,
-        image,
-        frames = { max: 1 },
-        collisionBox,
-        width,
-        height,
-    }) {
-        this.position = position;
-        this.image = image;
-        this.frames = frames;
-        this.width = width;
-        this.height = height;
-
-        // ESPERA A IMAGEM CARREGAR PARA RETORNAR SEU TAMANHO PELA QNTD DE FRAMES
-        this.image.onload = () => {
-            this.width = this.image.width / this.frames.max;
-            this.height = this.image.height;
-        };
-        this.collisionBox = collisionBox;
-    }
-
-    draw() {
-        c.drawImage(
-            this.image,
-            0,
-            0,
-            this.image.width / this.frames.max,
-            this.image.height,
-            this.position.x,
-            this.position.y,
-            this.image.width / this.frames.max,
-            this.image.height
-        );
-    }
-}
+const foregroundImage = new Image();
+foregroundImage.src = "./assets/imgs/foregroundObjects.png";
 
 // PROPRIEDADES DO FUNDO/BACKGROUND
 const background = new Sprite({
@@ -129,26 +77,20 @@ const player = new Sprite({
     },
 });
 
-// PROPRIEDADES DO CARRO (QUE ESTENDE DE SPRITE)
-class Car extends Sprite {
-    constructor({ position, image, velocity, collisionBox, width, height }) {
-        super({ position, image, collisionBox, width, height });
-        this.velocity = velocity;
-    }
-
-    // Método para atualizar a posição do carro a cada frame
-    update() {
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
-    }
-}
-
 // CARROS DO JOGO
 const cars = [
     new Car({
-        position: { x: 200, y: 300 }, // y 300 = fileira de cima
+        position: { x: -200, y: 300 }, // y 300 = fileira de cima
+        image: car2ReverseImage,
+        velocity: { x: 4, y: 0 }, // Movimento para a direita (positivo)
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Car({
+        position: { x: 200, y: 300 },
         image: car1ReverseImage,
-        velocity: { x: 3, y: 0 }, // Movimento para a direita (positivo)
+        velocity: { x: 4, y: 0 },
         collisionBox: { width: 100, height: 50 },
         width: 100,
         height: 50,
@@ -156,44 +98,45 @@ const cars = [
     new Car({
         position: { x: 600, y: 300 },
         image: car2ReverseImage,
-        velocity: { x: 3, y: 0 },
+        velocity: { x: 4, y: 0 },
         collisionBox: { width: 100, height: 50 },
         width: 100,
         height: 50,
     }),
     new Car({
-        position: { x: -200, y: 300 },
-        image: car2ReverseImage,
-        velocity: { x: 3, y: 0 },
+        position: { x: 300, y: 400 }, // y 400 = fileira de baixo
+        image: car1Image,
+        velocity: { x: -3, y: 0 }, // Movimento para a esquerda (negativo)
         collisionBox: { width: 100, height: 50 },
         width: 100,
         height: 50,
     }),
     new Car({
-        position: { x: 600, y: 400 }, // y 400 = fileira de baixo
+        position: { x: 700, y: 400 },
         image: car2Image,
-        velocity: { x: -2, y: 0 }, // Movimento para a esquerda (negativo)
+        velocity: { x: -3, y: 0 },
         collisionBox: { width: 100, height: 50 },
         width: 100,
         height: 50,
     }),
     new Car({
-        position: { x: 1000, y: 400 },
+        position: { x: 1100, y: 400 },
         image: car1Image,
-        velocity: { x: -2, y: 0 },
-        collisionBox: { width: 100, height: 50 },
-        width: 100,
-        height: 50,
-    }),
-    new Car({
-        position: { x: 300, y: 400 },
-        image: car1Image,
-        velocity: { x: -2, y: 0 },
+        velocity: { x: -3, y: 0 },
         collisionBox: { width: 100, height: 50 },
         width: 100,
         height: 50,
     }),
 ];
+
+// PROPRIEDADES DOS ELEMENTOS QUE FICAM ACIMA DE TUDO (FOREGROUND)
+const foreground = new Sprite({
+    position: {
+        x: offset.x,
+        y: offset.y,
+    },
+    image: foregroundImage,
+});
 
 // TECLAS DO JOGO INICIALIZADAS COMO NÃO PRESSIONADAS
 const keys = {
@@ -210,9 +153,6 @@ const keys = {
         pressed: false,
     },
 };
-
-// ELEMENTOS QUE PODEM SE MOVER PARA CIMA E PARA BAIXO
-const movables = [background, ...boundaries, ...cars];
 
 function rectangularCollision({ rectangle1, rectangle2 }) {
     // Usar as dimensões da caixa de colisão, se existirem
@@ -245,7 +185,11 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
     );
 }
 
+// CHECAGEM DE FIM DE JOGO
 let gameOver = false;
+
+// ELEMENTOS QUE PODEM SE MOVER PARA CIMA E PARA BAIXO
+const movables = [background, ...boundaries, ...cars, foreground];
 
 // DESENHO E MOVIMENTAÇÃO DOS ELEMENTOS NA TELA
 function animate() {
@@ -266,8 +210,8 @@ function animate() {
 
         // Reinicia o carro se ele sair da tela
         if (car.velocity.x > 0 && car.position.x > canvas.width + 100) {
-            car.position.x = -100;
-        } else if (car.velocity.x < 0 && car.position.x < -100) {
+            car.position.x = -150;
+        } else if (car.velocity.x < 0 && car.position.x < -150) {
             car.position.x = canvas.width + 100;
         }
 
@@ -278,6 +222,7 @@ function animate() {
         }
     });
     player.draw();
+    foreground.draw();
 
     // MOVIMENTAÇÃO DO JOGADOR, MOVENDO O FUNDO E CAIXAS DE COLISÃO
     // PARA AVANÇAR JUNTO COM O JOGADOR E DAR ILUSÃO DE MOVIMENTO
