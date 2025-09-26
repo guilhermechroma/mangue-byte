@@ -32,13 +32,29 @@ collisionsMap.forEach((row, i) => {
     });
 });
 
-// IMAGEM DO FUNDO/BACKGROUND
+// IMAGEM DE FUNDO
 const backgroundImage = new Image();
 backgroundImage.src = "./assets/imgs/map.png";
 
-// IMAGEM DO JOGADOR
-const playerImage = new Image();
-playerImage.src = "./assets/imgs/playerDown.png";
+// IMAGEM DOS ELEMENTOS EM PRIMEIRO PLANO
+const foregroundImage = new Image();
+foregroundImage.src = "./assets/imgs/foregroundObjects.png";
+
+// IMAGEM DO JOGADOR OLHANDO PARA BAIXO (PADRÃO)
+const playerDownImage = new Image();
+playerDownImage.src = "./assets/imgs/playerDown.png";
+
+// IMAGEM DO JOGADOR OLHANDO PARA CIMA
+const playerUpImage = new Image();
+playerUpImage.src = "./assets/imgs/playerUp.png";
+
+// IMAGEM DO JOGADOR OLHANDO PARA ESQUERDA
+const playerLeftImage = new Image();
+playerLeftImage.src = "./assets/imgs/playerLeft.png";
+
+// IMAGEM DO JOGADOR OLHANDO PARA DIREITA
+const playerRightImage = new Image();
+playerRightImage.src = "./assets/imgs/playerRight.png";
 
 //IMAGEM DOS CARROS
 const car1Image = new Image();
@@ -52,9 +68,6 @@ car2Image.src = "./assets/imgs/car2.png";
 
 const car2ReverseImage = new Image();
 car2ReverseImage.src = "./assets/imgs/car2-reverse.png";
-
-const foregroundImage = new Image();
-foregroundImage.src = "./assets/imgs/foregroundObjects.png";
 
 // PROPRIEDADES DO FUNDO/BACKGROUND
 const background = new Sprite({
@@ -71,9 +84,15 @@ const player = new Sprite({
         x: canvas.width / 2.1,
         y: 485,
     },
-    image: playerImage,
+    image: playerDownImage,
     frames: {
         max: 4,
+    },
+    sprites: {
+        up: playerUpImage,
+        down: playerDownImage,
+        left: playerLeftImage,
+        right: playerRightImage,
     },
 });
 
@@ -129,7 +148,7 @@ const cars = [
     }),
 ];
 
-// PROPRIEDADES DOS ELEMENTOS QUE FICAM ACIMA DE TUDO (FOREGROUND)
+// PROPRIEDADES DOS ELEMENTOS EM PRIMEIRO PLANO
 const foreground = new Sprite({
     position: {
         x: offset.x,
@@ -154,6 +173,7 @@ const keys = {
     },
 };
 
+// FUNÇÃO DE TODAS AS COLISÕES DO JOGO
 function rectangularCollision({ rectangle1, rectangle2 }) {
     // Usar as dimensões da caixa de colisão, se existirem
     const rect1Width = rectangle1.collisionBox
@@ -224,11 +244,13 @@ function animate() {
     player.draw();
     foreground.draw();
 
-    // MOVIMENTAÇÃO DO JOGADOR, MOVENDO O FUNDO E CAIXAS DE COLISÃO
-    // PARA AVANÇAR JUNTO COM O JOGADOR E DAR ILUSÃO DE MOVIMENTO
+    player.moving = false;
 
     // Verificação de movimento UP (W)
     if (keys.w.pressed) {
+        player.moving = true;
+        player.image = player.sprites.up;
+
         let canMoveUp = true;
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i];
@@ -239,7 +261,7 @@ function animate() {
                         ...boundary,
                         position: {
                             x: boundary.position.x,
-                            y: boundary.position.y + 2.5,
+                            y: boundary.position.y + 2,
                         },
                     },
                 })
@@ -257,6 +279,9 @@ function animate() {
 
     // Verificação de movimento DOWN (S)
     if (keys.s.pressed) {
+        player.moving = true;
+        player.image = player.sprites.down;
+
         let canMoveDown = true;
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i];
@@ -267,7 +292,7 @@ function animate() {
                         ...boundary,
                         position: {
                             x: boundary.position.x,
-                            y: boundary.position.y - 2.5,
+                            y: boundary.position.y - 2,
                         },
                     },
                 })
@@ -285,6 +310,9 @@ function animate() {
 
     // Verificação de movimento LEFT (A)
     if (keys.a.pressed) {
+        player.moving = true;
+        player.image = player.sprites.left;
+
         let canMoveLeft = true;
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i];
@@ -294,7 +322,7 @@ function animate() {
                     rectangle2: {
                         ...boundary,
                         position: {
-                            x: boundary.position.x + 2.5,
+                            x: boundary.position.x + 2,
                             y: boundary.position.y,
                         },
                     },
@@ -311,6 +339,9 @@ function animate() {
 
     // Verificação de movimento RIGHT (D)
     if (keys.d.pressed) {
+        player.moving = true;
+        player.image = player.sprites.right;
+
         let canMoveRight = true;
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i];
@@ -320,7 +351,7 @@ function animate() {
                     rectangle2: {
                         ...boundary,
                         position: {
-                            x: boundary.position.x - 2.5,
+                            x: boundary.position.x - 2,
                             y: boundary.position.y,
                         },
                     },
