@@ -120,8 +120,9 @@ const carsToRight = [car1ReverseImage, car2ReverseImage]; // Imagens para carros
 
 // CARROS DO JOGO
 const cars = [
+    // PRIMEIRA RUA
     new Vehicle({
-        position: { x: -200, y: 300 }, // y 300 = fileira de cima
+        position: { x: -200, y: 300 }, // y 300 = fileira de cima (primeira rua)
         image: getRandomImage(carsToRight),
         velocity: { x: 4, y: 0 }, // Movimento para a direita (positivo)
         collisionBox: { width: 100, height: 50 },
@@ -137,7 +138,7 @@ const cars = [
         height: 50,
     }),
     new Vehicle({
-        position: { x: 300, y: 400 }, // y 400 = fileira de baixo
+        position: { x: 300, y: 400 }, // y 400 = fileira de baixo (primeira rua)
         image: getRandomImage(carsToLeft),
         velocity: { x: -3, y: 0 }, // Movimento para a esquerda (negativo)
         collisionBox: { width: 100, height: 50 },
@@ -152,6 +153,105 @@ const cars = [
         width: 100,
         height: 50,
     }),
+    // SEGUNDA RUA
+    new Vehicle({
+        position: { x: -200, y: -800 }, // y -800 = fileira de cima (segunda rua)
+        image: getRandomImage(carsToRight),
+        velocity: { x: 4, y: 0 }, // Movimento para a direita (positivo)
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Vehicle({
+        position: { x: 600, y: -800 },
+        image: getRandomImage(carsToRight),
+        velocity: { x: 4, y: 0 },
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Vehicle({
+        position: { x: 300, y: -700 }, // y -700 = fileira de baixo (segunda rua)
+        image: getRandomImage(carsToLeft),
+        velocity: { x: -3, y: 0 }, // Movimento para a esquerda (negativo)
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Vehicle({
+        position: { x: 700, y: -700 },
+        image: getRandomImage(carsToLeft),
+        velocity: { x: -3, y: 0 },
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    // TERCEIRA RUA
+    new Vehicle({
+        position: { x: -200, y: -1120 }, // y -1120 = fileira de cima (terceira rua)
+        image: getRandomImage(carsToRight),
+        velocity: { x: 4, y: 0 }, // Movimento para a direita (positivo)
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Vehicle({
+        position: { x: 600, y: -1120 },
+        image: getRandomImage(carsToRight),
+        velocity: { x: 4, y: 0 },
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Vehicle({
+        position: { x: 300, y: -1020 }, // y -1020 = fileira de baixo (terceira rua)
+        image: getRandomImage(carsToLeft),
+        velocity: { x: -3, y: 0 }, // Movimento para a esquerda (negativo)
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Vehicle({
+        position: { x: 700, y: -1020 },
+        image: getRandomImage(carsToLeft),
+        velocity: { x: -3, y: 0 },
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    // QUARTA RUA
+    new Vehicle({
+        position: { x: -200, y: -2140 }, // y -2140 = fileira de cima (quarta rua)
+        image: getRandomImage(carsToRight),
+        velocity: { x: 4, y: 0 }, // Movimento para a direita (positivo)
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Vehicle({
+        position: { x: 600, y: -2140 },
+        image: getRandomImage(carsToRight),
+        velocity: { x: 4, y: 0 },
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Vehicle({
+        position: { x: 300, y: -2040 }, // y -2040 = fileira de baixo (quarta rua)
+        image: getRandomImage(carsToLeft),
+        velocity: { x: -3, y: 0 }, // Movimento para a esquerda (negativo)
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Vehicle({
+        position: { x: 700, y: -2040 },
+        image: getRandomImage(carsToLeft),
+        velocity: { x: -3, y: 0 },
+        collisionBox: { width: 100, height: 50 },
+        width: 100,
+        height: 50,
+    }),
 ];
 
 const trucksToLeft = [truck1Image, truck2Image]; // Imagens para caminhões que movem para a esquerda
@@ -159,21 +259,73 @@ const trucksToRight = [truck1ReverseImage, truck2ReverseImage]; // Imagens para 
 
 // CAMINHÕES DO JOGO (TEM HITBOX MAIOR QUE OS CARROS)
 const trucks = [
+    // PRIMEIRA RUA
     new Vehicle({
         position: { x: 200, y: 285 },
         image: getRandomImage(trucksToRight),
         velocity: { x: 4, y: 0 },
-        collisionBox: { width: 150, height: 50 },
-        width: 100,
-        height: 50,
+        collisionBox: { width: 150, height: 80 },
+        width: 150,
+        height: 80,
     }),
     new Vehicle({
         position: { x: 1100, y: 385 },
         image: getRandomImage(trucksToLeft),
         velocity: { x: -3, y: 0 },
-        collisionBox: { width: 150, height: 50 },
-        width: 100,
-        height: 50,
+        collisionBox: { width: 150, height: 80 },
+        width: 150,
+        height: 80,
+    }),
+    // SEGUNDA RUA
+    new Vehicle({
+        position: { x: 200, y: -815 },
+        image: getRandomImage(trucksToRight),
+        velocity: { x: 4, y: 0 },
+        collisionBox: { width: 150, height: 80 },
+        width: 150,
+        height: 80,
+    }),
+    new Vehicle({
+        position: { x: 1100, y: -715 },
+        image: getRandomImage(trucksToLeft),
+        velocity: { x: -3, y: 0 },
+        collisionBox: { width: 150, height: 80 },
+        width: 150,
+        height: 80,
+    }),
+    // TERCEIRA RUA
+    new Vehicle({
+        position: { x: 200, y: -1135 },
+        image: getRandomImage(trucksToRight),
+        velocity: { x: 4, y: 0 },
+        collisionBox: { width: 150, height: 80 },
+        width: 150,
+        height: 80,
+    }),
+    new Vehicle({
+        position: { x: 1100, y: -1035 },
+        image: getRandomImage(trucksToLeft),
+        velocity: { x: -3, y: 0 },
+        collisionBox: { width: 150, height: 80 },
+        width: 150,
+        height: 80,
+    }),
+    // QUARTA RUA
+    new Vehicle({
+        position: { x: 200, y: -2155 },
+        image: getRandomImage(trucksToRight),
+        velocity: { x: 4, y: 0 },
+        collisionBox: { width: 150, height: 80 },
+        width: 150,
+        height: 80,
+    }),
+    new Vehicle({
+        position: { x: 1100, y: -2055 },
+        image: getRandomImage(trucksToLeft),
+        velocity: { x: -3, y: 0 },
+        collisionBox: { width: 150, height: 80 },
+        width: 150,
+        height: 80,
     }),
 ];
 
@@ -300,7 +452,7 @@ function animate() {
     player.draw();
     foreground.draw();
 
-    const playerSpeed = 3;
+    const playerSpeed = 8;
     player.moving = false;
 
     // Verificação de movimento UP (W)
