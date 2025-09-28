@@ -54,6 +54,20 @@ class Sprite {
     }
 }
 
+// CLASSE DE VEÍCULO (QUE ESTENDE DE SPRITE)
+class Vehicle extends Sprite {
+    constructor({ position, image, velocity, collisionBox, width, height }) {
+        super({ position, image, collisionBox, width, height });
+        this.velocity = velocity;
+    }
+
+    // Método para atualizar a posição do carro a cada frame
+    update() {
+        this.position.x += this.velocity.x;
+        this.position.y += this.velocity.y;
+    }
+}
+
 // CLASSE DAS PROPRIEDADES DOS LIMITES/BOUNDARIES/CAIXAS DE COLISÃO
 class Boundary {
     static width = 64;
@@ -70,16 +84,18 @@ class Boundary {
     }
 }
 
-// CLASSE DE VEÍCULO (QUE ESTENDE DE SPRITE)
-class Vehicle extends Sprite {
-    constructor({ position, image, velocity, collisionBox, width, height }) {
-        super({ position, image, collisionBox, width, height });
-        this.velocity = velocity;
+// CLASSE DA COLISÃO DE VITÓRIA (QUE ESTENDE DE BOUNDARY)
+class WinBoundary extends Boundary {
+    static width = 64;
+    static height = 64;
+    super({ position }) {
+        this.position = position;
+        this.width = 64;
+        this.height = 64;
     }
 
-    // Método para atualizar a posição do carro a cada frame
-    update() {
-        this.position.x += this.velocity.x;
-        this.position.y += this.velocity.y;
+    draw() {
+        c.fillStyle = "rgba(0, 255, 0, 0.0)";
+        c.fillRect(this.position.x, this.position.y, this.width, this.height);
     }
 }

@@ -4,28 +4,51 @@ const canvas = document.querySelector(".game-canvas");
 // VARIÁVEL FÁCIL DO CANVAS NO CONTEXTO DO JOGO
 const c = canvas.getContext("2d");
 
+const boundaries = []; // Colisão normal
+const winBoundaries = []; // Colisão de vitória
+const offset = {
+    // Referente à posição inicial do fundo e elementos que seguem o fundo
+    x: 0,
+    y: -2580,
+};
+
 // CORTA O JSON DAS CAIXAS DE COLISÃO EM VÁRIAS LINHAS E ARMAZENA NUMA ARRAY
 const collisionsMap = [];
 for (let i = 0; i < collisions.length; i += 15) {
     collisionsMap.push(collisions.slice(i, 15 + i));
 }
 
-const boundaries = [];
-const offset = {
-    x: 0,
-    y: -2580,
-};
-
 // DEFINE ONDE AS COLISÕES SERÃO LOCALIZADAS PELO VALOR DELAS NO JSON
 collisionsMap.forEach((row, i) => {
     row.forEach((symbol, j) => {
-        // VALOR DA CAIXA DE COLISÃO NO JSON
+        // VALOR DA CAIXA DE COLISÃO (4097) NO JSON
         if (symbol === 4097)
             boundaries.push(
                 new Boundary({
                     position: {
                         x: j * Boundary.width + offset.x,
                         y: i * Boundary.height + offset.y,
+                    },
+                })
+            );
+    });
+});
+
+// CORTA O JSON DAS COLISÃO DE VITÓRIA EM VÁRIAS LINHAS E ARMAZENA EM OUTRA ARRAY
+const winMap = [];
+for (let i = 0; i < win.length; i += 15) {
+    winMap.push(win.slice(i, 15 + i));
+}
+
+winMap.forEach((row, i) => {
+    row.forEach((symbol, j) => {
+        // VALOR DA CAIXA DE COLISÃO DE VITÓRIA (4098) NO JSON
+        if (symbol === 4098)
+            winBoundaries.push(
+                new WinBoundary({
+                    position: {
+                        x: j * WinBoundary.width + offset.x,
+                        y: i * WinBoundary.height + offset.y,
                     },
                 })
             );
@@ -87,6 +110,9 @@ function getRandomImage(array) {
     const randomIndex = Math.floor(Math.random() * array.length);
     return array[randomIndex];
 }
+
+// VARIÁVEL PARA REGISTRAR O TEMPO DE INÍCIO DO JOGO
+let startTime = Date.now();
 
 // PROPRIEDADES DO FUNDO/BACKGROUND
 const background = new Sprite({
@@ -397,18 +423,62 @@ let gameOver = false;
 let atTop = false;
 
 // ELEMENTOS QUE PODEM SE MOVER PARA CIMA E PARA BAIXO
-const movables = [background, ...boundaries, ...cars, ...trucks, foreground];
+const movables = [
+    background,
+    ...boundaries,
+    ...winBoundaries,
+    ...cars,
+    ...trucks,
+    foreground,
+];
 
 // DESENHO E MOVIMENTAÇÃO DOS ELEMENTOS NA TELA
 function animate() {
+    // FUNÇÃO PARA CALCULAR O TEMPO DE JOGO
+    function getElapsedTime() {
+        const elapsedMilliseconds = Date.now() - startTime;
+        const totalSeconds = elapsedMilliseconds / 1000;
+
+        // Calcula os minutos
+        const minutes = Math.floor(totalSeconds / 60);
+
+        // Calcula os segundos restantes (o resto da divisão por 60)
+        const seconds = Math.floor(totalSeconds % 60);
+
+        // Calcula os milissegundos restantes (as casas decimais dos segundos)
+        // Usa toFixed(3) para 3 casas decimais
+        const milliseconds = (totalSeconds % 1).toFixed(3).substring(2);
+
+        // Formata a string de tempo
+        let timeString = "";
+
+        // Adiciona minutos apenas se o tempo for >= 1 minuto
+        if (minutes > 0) {
+            timeString += `${minutes} minuto${minutes > 1 ? "s" : ""}, `;
+        }
+
+        // Adiciona segundos e milissegundos
+        timeString += `${seconds} segundo${
+            seconds !== 1 ? "s" : ""
+        } e ${milliseconds} milissegundos`;
+
+        return timeString;
+    }
+
     // Se o jogo acabou, para a animação
     if (gameOver) {
         return;
     }
 
+    // Função importante para pedir ao navegador que continue desenhando os elementos em tela
     window.requestAnimationFrame(animate);
+
+    // Desenha na tela os elementos que não atualizam
     background.draw();
     boundaries.forEach((boundary) => {
+        boundary.draw();
+    });
+    winBoundaries.forEach((boundary) => {
         boundary.draw();
     });
 
@@ -452,10 +522,13 @@ function animate() {
             gameOver = true;
         }
     });
-    player.draw();
-    foreground.draw();
 
-    const playerSpeed = 3.5;
+    // Desenha os últimos elementos em ordem (o último fica em cima do anterior)
+    player.draw();
+    foreground.draw(); // Elementos em primeiro plano são desenhados em cima de tudo
+
+    // Propriedades padrão do jogador
+    const playerSpeed = 10;
     player.moving = false;
 
     // CONDIÇÃO PARA MUDAR O MODO DE MOVIMENTO
@@ -474,6 +547,7 @@ function animate() {
         player.image = player.sprites.up;
 
         let canMoveUp = true;
+        // CHECAGEM PARA CAIXAS DE COLISÃO
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i];
             if (
@@ -490,6 +564,21 @@ function animate() {
             ) {
                 canMoveUp = false;
                 break;
+            }
+        }
+        // CHECAGEM PARA COLISÃO COM O FIM DA FASE
+        for (let i = 0; i < winBoundaries.length; i++) {
+            const winBoundary = winBoundaries[i];
+            if (
+                rectangularCollision({
+                    rectangle1: player,
+                    rectangle2: winBoundary,
+                })
+            ) {
+                // Obtém o tempo decorrido
+                const timeTaken = getElapsedTime();
+                alert(`Você GANHOU! \nTempo Total: ${timeTaken}`);
+                gameOver = true;
             }
         }
         if (canMoveUp) {
@@ -513,6 +602,8 @@ function animate() {
         player.image = player.sprites.down;
 
         let canMoveDown = true;
+
+        // CHECAGEM PARA CAIXAS DE COLISÃO
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i];
             if (
@@ -529,6 +620,21 @@ function animate() {
             ) {
                 canMoveDown = false;
                 break;
+            }
+        }
+        // CHECAGEM PARA COLISÃO COM O FIM DA FASE
+        for (let i = 0; i < winBoundaries.length; i++) {
+            const winBoundary = winBoundaries[i];
+            if (
+                rectangularCollision({
+                    rectangle1: player,
+                    rectangle2: winBoundary,
+                })
+            ) {
+                // Obtém o tempo decorrido
+                const timeTaken = getElapsedTime();
+                alert(`Você GANHOU! \nTempo Total: ${timeTaken}`);
+                gameOver = true;
             }
         }
         if (canMoveDown) {
@@ -551,6 +657,7 @@ function animate() {
         player.image = player.sprites.left;
 
         let canMoveLeft = true;
+        // CHECAGEM PARA CAIXAS DE COLISÃO
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i];
             if (
@@ -569,6 +676,21 @@ function animate() {
                 break;
             }
         }
+        // CHECAGEM PARA COLISÃO COM O FIM DA FASE
+        for (let i = 0; i < winBoundaries.length; i++) {
+            const winBoundary = winBoundaries[i];
+            if (
+                rectangularCollision({
+                    rectangle1: player,
+                    rectangle2: winBoundary,
+                })
+            ) {
+                // Obtém o tempo decorrido
+                const timeTaken = getElapsedTime();
+                alert(`Você GANHOU! \nTempo Total: ${timeTaken}`);
+                gameOver = true;
+            }
+        }
         if (canMoveLeft) {
             player.position.x -= playerSpeed;
         }
@@ -580,6 +702,7 @@ function animate() {
         player.image = player.sprites.right;
 
         let canMoveRight = true;
+        // CHECAGEM PARA CAIXAS DE COLISÃO
         for (let i = 0; i < boundaries.length; i++) {
             const boundary = boundaries[i];
             if (
@@ -596,6 +719,21 @@ function animate() {
             ) {
                 canMoveRight = false;
                 break;
+            }
+        }
+        // CHECAGEM PARA COLISÃO COM O FIM DA FASE
+        for (let i = 0; i < winBoundaries.length; i++) {
+            const winBoundary = winBoundaries[i];
+            if (
+                rectangularCollision({
+                    rectangle1: player,
+                    rectangle2: winBoundary,
+                })
+            ) {
+                // Obtém o tempo decorrido
+                const timeTaken = getElapsedTime();
+                alert(`Você GANHOU! \nTempo Total: ${timeTaken}`);
+                gameOver = true;
             }
         }
         if (canMoveRight) {
