@@ -393,6 +393,9 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
 // CHECAGEM DE FIM DE JOGO
 let gameOver = false;
 
+// CHECAGEM PARA O TOPO DO MAPA
+let atTop = false;
+
 // ELEMENTOS QUE PODEM SE MOVER PARA CIMA E PARA BAIXO
 const movables = [background, ...boundaries, ...cars, ...trucks, foreground];
 
@@ -455,6 +458,16 @@ function animate() {
     const playerSpeed = 8;
     player.moving = false;
 
+    // CONDIÇÃO PARA MUDAR O MODO DE MOVIMENTO
+    const topLimit = 0; // O topo do mapa é atingido quando background.position.y é 0 (ou um pouco mais)
+
+    // CHECAGEM SE O LIMITE FOI ALCANÇADO, PARA MUDAR MODO DE MOVIMENTO
+    if (background.position.y >= topLimit) {
+        atTop = true;
+    } else {
+        atTop = false;
+    }
+
     // Verificação de movimento UP (W)
     if (keys.w.pressed) {
         player.moving = true;
@@ -480,9 +493,17 @@ function animate() {
             }
         }
         if (canMoveUp) {
-            movables.forEach((movable) => {
-                movable.position.y += playerSpeed;
-            });
+            if (!atTop) {
+                movables.forEach((movable) => {
+                    movable.position.y += playerSpeed;
+                });
+            } else {
+                // Se ESTIVER no topo, move APENAS o jogador para cima
+                // E garante que ele não saia do limite superior da tela
+                if (player.position.y > 0) {
+                    player.position.y -= playerSpeed; // Move o jogador para cima
+                }
+            }
         }
     }
 
@@ -511,9 +532,16 @@ function animate() {
             }
         }
         if (canMoveDown) {
-            movables.forEach((movable) => {
-                movable.position.y -= playerSpeed;
-            });
+            // Se o jogador estiver no topo (atTop) E não estiver na posição inicial de Y (485),
+            // move o jogador para baixo.
+            if (atTop && player.position.y < canvas.height / 2.1) {
+                player.position.y += playerSpeed; // Move o jogador para baixo
+            } else {
+                // Caso contrário, move o mapa (movables)
+                movables.forEach((movable) => {
+                    movable.position.y -= playerSpeed;
+                });
+            }
         }
     }
 
