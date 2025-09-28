@@ -70,8 +70,8 @@ class Boundary {
     }
 }
 
-// CLASSE DO CARRO (QUE ESTENDE DE SPRITE)
-class Car extends Sprite {
+// CLASSE DE VEÍCULO (QUE ESTENDE DE SPRITE)
+class Vehicle extends Sprite {
     constructor({ position, image, velocity, collisionBox, width, height }) {
         super({ position, image, collisionBox, width, height });
         this.velocity = velocity;

@@ -69,6 +69,25 @@ car2Image.src = "./assets/imgs/car2.png";
 const car2ReverseImage = new Image();
 car2ReverseImage.src = "./assets/imgs/car2-reverse.png";
 
+//IMAGEM DOS CARROS
+const truck1Image = new Image();
+truck1Image.src = "./assets/imgs/truck1.png";
+
+const truck1ReverseImage = new Image();
+truck1ReverseImage.src = "./assets/imgs/truck1-reverse.png";
+
+const truck2Image = new Image();
+truck2Image.src = "./assets/imgs/truck2.png";
+
+const truck2ReverseImage = new Image();
+truck2ReverseImage.src = "./assets/imgs/truck2-reverse.png";
+
+// FUNÇÃO PARA PEGAR UMA IMAGEM ALEATÓRIA DENTRO DE UMA ARRAY
+function getRandomImage(array) {
+    const randomIndex = Math.floor(Math.random() * array.length);
+    return array[randomIndex];
+}
+
 // PROPRIEDADES DO FUNDO/BACKGROUND
 const background = new Sprite({
     position: {
@@ -96,57 +115,71 @@ const player = new Sprite({
     },
 });
 
+const carsToLeft = [car1Image, car2Image]; // Imagens para carros que movem para a esquerda
+const carsToRight = [car1ReverseImage, car2ReverseImage]; // Imagens para carros que movem para a direita
+
 // CARROS DO JOGO
 const cars = [
-    new Car({
+    new Vehicle({
         position: { x: -200, y: 300 }, // y 300 = fileira de cima
-        image: car2ReverseImage,
+        image: getRandomImage(carsToRight),
         velocity: { x: 4, y: 0 }, // Movimento para a direita (positivo)
         collisionBox: { width: 100, height: 50 },
         width: 100,
         height: 50,
     }),
-    new Car({
-        position: { x: 200, y: 300 },
-        image: car1ReverseImage,
-        velocity: { x: 4, y: 0 },
-        collisionBox: { width: 100, height: 50 },
-        width: 100,
-        height: 50,
-    }),
-    new Car({
+    new Vehicle({
         position: { x: 600, y: 300 },
-        image: car2ReverseImage,
+        image: getRandomImage(carsToRight),
         velocity: { x: 4, y: 0 },
         collisionBox: { width: 100, height: 50 },
         width: 100,
         height: 50,
     }),
-    new Car({
+    new Vehicle({
         position: { x: 300, y: 400 }, // y 400 = fileira de baixo
-        image: car1Image,
+        image: getRandomImage(carsToLeft),
         velocity: { x: -3, y: 0 }, // Movimento para a esquerda (negativo)
         collisionBox: { width: 100, height: 50 },
         width: 100,
         height: 50,
     }),
-    new Car({
+    new Vehicle({
         position: { x: 700, y: 400 },
-        image: car2Image,
-        velocity: { x: -3, y: 0 },
-        collisionBox: { width: 100, height: 50 },
-        width: 100,
-        height: 50,
-    }),
-    new Car({
-        position: { x: 1100, y: 400 },
-        image: car1Image,
+        image: getRandomImage(carsToLeft),
         velocity: { x: -3, y: 0 },
         collisionBox: { width: 100, height: 50 },
         width: 100,
         height: 50,
     }),
 ];
+
+const trucksToLeft = [truck1Image, truck2Image]; // Imagens para caminhões que movem para a esquerda
+const trucksToRight = [truck1ReverseImage, truck2ReverseImage]; // Imagens para caminhões que movem para a direita
+
+// CAMINHÕES DO JOGO (TEM HITBOX MAIOR QUE OS CARROS)
+const trucks = [
+    new Vehicle({
+        position: { x: 200, y: 285 },
+        image: getRandomImage(trucksToRight),
+        velocity: { x: 4, y: 0 },
+        collisionBox: { width: 150, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+    new Vehicle({
+        position: { x: 1100, y: 385 },
+        image: getRandomImage(trucksToLeft),
+        velocity: { x: -3, y: 0 },
+        collisionBox: { width: 150, height: 50 },
+        width: 100,
+        height: 50,
+    }),
+];
+
+// ARRAY QUE ARMAZENA TODOS OS VEÍCULOS DO JOGO
+const vehicles = [];
+vehicles.push(...cars, ...trucks);
 
 // PROPRIEDADES DOS ELEMENTOS EM PRIMEIRO PLANO
 const foreground = new Sprite({
@@ -209,7 +242,7 @@ function rectangularCollision({ rectangle1, rectangle2 }) {
 let gameOver = false;
 
 // ELEMENTOS QUE PODEM SE MOVER PARA CIMA E PARA BAIXO
-const movables = [background, ...boundaries, ...cars, foreground];
+const movables = [background, ...boundaries, ...cars, ...trucks, foreground];
 
 // DESENHO E MOVIMENTAÇÃO DOS ELEMENTOS NA TELA
 function animate() {
@@ -223,6 +256,7 @@ function animate() {
     boundaries.forEach((boundary) => {
         boundary.draw();
     });
+
     // Loop para atualizar e desenhar os carros
     cars.forEach((car) => {
         car.update(); // Atualiza a posição
@@ -230,13 +264,35 @@ function animate() {
 
         // Reinicia o carro se ele sair da tela
         if (car.velocity.x > 0 && car.position.x > canvas.width + 100) {
-            car.position.x = -150;
-        } else if (car.velocity.x < 0 && car.position.x < -150) {
+            car.position.x = -200;
+            car.image = getRandomImage(carsToRight); // Randomiza a imagem do carro novamente ao ser resetado
+        } else if (car.velocity.x < 0 && car.position.x < -180) {
             car.position.x = canvas.width + 100;
+            car.image = getRandomImage(carsToLeft); // Randomiza a imagem do carro novamente ao ser resetado
         }
 
-        // Lógica de colisão entre o player e o carro
+        // Lógica de colisão entre o jogador e o carro
         if (rectangularCollision({ rectangle1: player, rectangle2: car })) {
+            alert("Você foi atropelado! Fim de jogo.");
+            gameOver = true;
+        }
+    });
+    // Loop para atualizar e desenhar os caminhões
+    trucks.forEach((truck) => {
+        truck.update();
+        truck.draw();
+
+        // Reinicia o carro se ele sair da tela
+        if (truck.velocity.x > 0 && truck.position.x > canvas.width + 100) {
+            truck.position.x = -200;
+            truck.image = getRandomImage(trucksToRight);
+        } else if (truck.velocity.x < 0 && truck.position.x < -180) {
+            truck.position.x = canvas.width + 100;
+            truck.image = getRandomImage(trucksToLeft);
+        }
+
+        // Lógica de colisão entre o jogador e o carro
+        if (rectangularCollision({ rectangle1: player, rectangle2: truck })) {
             alert("Você foi atropelado! Fim de jogo.");
             gameOver = true;
         }
@@ -244,6 +300,7 @@ function animate() {
     player.draw();
     foreground.draw();
 
+    const playerSpeed = 3;
     player.moving = false;
 
     // Verificação de movimento UP (W)
@@ -272,7 +329,7 @@ function animate() {
         }
         if (canMoveUp) {
             movables.forEach((movable) => {
-                movable.position.y += 3.14;
+                movable.position.y += playerSpeed;
             });
         }
     }
@@ -303,7 +360,7 @@ function animate() {
         }
         if (canMoveDown) {
             movables.forEach((movable) => {
-                movable.position.y -= 3.14;
+                movable.position.y -= playerSpeed;
             });
         }
     }
@@ -333,7 +390,7 @@ function animate() {
             }
         }
         if (canMoveLeft) {
-            player.position.x -= 3.14;
+            player.position.x -= playerSpeed;
         }
     }
 
@@ -362,7 +419,7 @@ function animate() {
             }
         }
         if (canMoveRight) {
-            player.position.x += 3.14;
+            player.position.x += playerSpeed;
         }
     }
 }
