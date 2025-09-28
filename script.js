@@ -455,7 +455,7 @@ function animate() {
     player.draw();
     foreground.draw();
 
-    const playerSpeed = 8;
+    const playerSpeed = 3.5;
     player.moving = false;
 
     // CONDIÇÃO PARA MUDAR O MODO DE MOVIMENTO
@@ -483,7 +483,7 @@ function animate() {
                         ...boundary,
                         position: {
                             x: boundary.position.x,
-                            y: boundary.position.y + 2,
+                            y: boundary.position.y + playerSpeed,
                         },
                     },
                 })
@@ -522,7 +522,7 @@ function animate() {
                         ...boundary,
                         position: {
                             x: boundary.position.x,
-                            y: boundary.position.y - 2,
+                            y: boundary.position.y - playerSpeed,
                         },
                     },
                 })
@@ -559,7 +559,7 @@ function animate() {
                     rectangle2: {
                         ...boundary,
                         position: {
-                            x: boundary.position.x + 2,
+                            x: boundary.position.x + playerSpeed,
                             y: boundary.position.y,
                         },
                     },
@@ -588,7 +588,7 @@ function animate() {
                     rectangle2: {
                         ...boundary,
                         position: {
-                            x: boundary.position.x - 2,
+                            x: boundary.position.x - playerSpeed,
                             y: boundary.position.y,
                         },
                     },
