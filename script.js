@@ -528,7 +528,7 @@ function animate() {
     foreground.draw(); // Elementos em primeiro plano são desenhados em cima de tudo
 
     // Propriedades padrão do jogador
-    const playerSpeed = 10;
+    const playerSpeed = 3.5;
     player.moving = false;
 
     // CONDIÇÃO PARA MUDAR O MODO DE MOVIMENTO
