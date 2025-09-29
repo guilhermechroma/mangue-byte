@@ -15,6 +15,9 @@ class Sprite {
         this.width = width;
         this.height = height;
 
+        this.frames.frameWidth = width;
+        this.frames.frameHeight = height;
+
         // ESPERA A IMAGEM CARREGAR PARA RETORNAR SEU TAMANHO PELA QNTD DE FRAMES
         this.image.onload = () => {
             this.width = this.image.width / this.frames.max;
@@ -65,17 +68,19 @@ class Vehicle extends Sprite {
     update() {
         this.position.x += this.velocity.x;
         this.position.y += this.velocity.y;
+        c.fillStyle = "rgba(255, 0, 0, 0.0)";
+        c.fillRect(this.position.x, this.position.y, this.width, this.height);
     }
 }
 
 // CLASSE DAS PROPRIEDADES DOS LIMITES/BOUNDARIES/CAIXAS DE COLISÃO
 class Boundary {
-    static width = 64;
-    static height = 64;
+    static width = 60;
+    static height = 55;
     constructor({ position }) {
         this.position = position;
-        this.width = 64;
-        this.height = 64;
+        this.width = 60;
+        this.height = 55;
     }
 
     draw() {
@@ -84,14 +89,30 @@ class Boundary {
     }
 }
 
-// CLASSE DA COLISÃO DE VITÓRIA (QUE ESTENDE DE BOUNDARY)
-class WinBoundary extends Boundary {
-    static width = 64;
-    static height = 64;
+// CLASSE DA COLISÃO DO JOGADOR DEBAIXO D'ÁGUA (QUE ESTENDE DE BOUNDARY)
+class UnderwaterBoundary extends Boundary {
+    static width = 60;
+    static height = 55;
     super({ position }) {
         this.position = position;
-        this.width = 64;
-        this.height = 64;
+        this.width = 60;
+        this.height = 55;
+    }
+
+    draw() {
+        c.fillStyle = "rgba(0, 0, 255, 0.0)";
+        c.fillRect(this.position.x, this.position.y, this.width, this.height);
+    }
+}
+
+// CLASSE DA COLISÃO DE VITÓRIA (QUE ESTENDE DE BOUNDARY)
+class WinBoundary extends Boundary {
+    static width = 60;
+    static height = 55;
+    super({ position }) {
+        this.position = position;
+        this.width = 60;
+        this.height = 55;
     }
 
     draw() {
